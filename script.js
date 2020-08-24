@@ -40,11 +40,43 @@ let finalTimeDisplay = '0.0s';
 // Scroll
 let valueY = 0;
 
+//Reset the game
+function playAgain() {
+  gamePage.addEventListener('click', startTimer);
+  scorePage.hidden = true;
+  splashPage.hidden = false;
+  equationsArray = [];
+  playerGuessArray = [];
+  valueY = 0;
+  playAgainBtn.hidden = true;
+}
+
+//Show score page
+function showScorePage() {
+  //Show Play again button after 1s
+  setTimeout(() => {
+    playAgainBtn.hidden = false;
+  }, 1000);
+  gamePage.hidden = true;
+  scorePage.hidden = false;
+}
+
+//Format and display time in DOM
+function scoresToDom(){
+  finalTimeDisplay = finalTime.toFixed(1);
+  baseTime = timePlayed.toFixed(1);
+  penaltyTime = penaltyTime.toFixed(1);
+  baseTimeEl.textContent = `Base Time: ${baseTime}s`;
+  penaltyTimeEl.textContent = `Penalty Time: +${penaltyTime}s`;
+  finalTimeEl.textContent = `${finalTimeDisplay}s`;
+  //Reset item container. Scroll to top
+  itemContainer.scrollTo({ top: 0, behavior: 'instant'});
+  showScorePage();
+}
+
 //Stop timer and process results and go to score page
 function checkTime() {
-  console.log(timePlayed);
   if (playerGuessArray.length == questionAmount){
-    console.log('guess array:', playerGuessArray);
     clearInterval(timer);
     //Check for wrong guesses, and add penalty time.
      equationsArray.forEach((equation, index) => {
@@ -55,7 +87,7 @@ function checkTime() {
       }
      });
      finalTime = timePlayed + penaltyTime;
-     console.log('time', timePlayed, 'penalty', penaltyTime, 'final', finalTime);
+     scoresToDom();
   }
 }
 
@@ -201,7 +233,6 @@ function getRadioValue(){
 function selectQuestionAmount(e){
   e.preventDefault();
   questionAmount = getRadioValue();
-  console.log('question amount:', questionAmount);
   if (questionAmount) {
     showCountdown();
   } else {
