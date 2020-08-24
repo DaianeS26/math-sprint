@@ -30,15 +30,54 @@ let equationObject = {};
 const wrongFormat = [];
 
 // Time
+let timer;
+let timePlayed = 0;
+let baseTime = 0;
+let penaltyTime = 0;
+let finalTime = 0;
+let finalTimeDisplay = '0.0s';
 
 // Scroll
 let valueY = 0;
 
+//Stop timer and process results and go to score page
+function checkTime() {
+  console.log(timePlayed);
+  if (playerGuessArray.length == questionAmount){
+    console.log('guess array:', playerGuessArray);
+    clearInterval(timer);
+    //Check for wrong guesses, and add penalty time.
+     equationsArray.forEach((equation, index) => {
+      if (equation.evaluated === playerGuessArray[index]){
+      //Correct guess, no penalty
+      } else {
+        penaltyTime += 0.5;
+      }
+     });
+     finalTime = timePlayed + penaltyTime;
+     console.log('time', timePlayed, 'penalty', penaltyTime, 'final', finalTime);
+  }
+}
+
+//Add a tenth of a second to timePlayed
+function addTime(){
+  timePlayed += 0.1;
+  checkTime();
+}
+
+//Start timer when game page is clicked
+function startTimer() {
+  //Reset times 
+  timePlayed = 0;
+  penaltyTime = 0;
+  finalTime = 0;
+  timer = setInterval(addTime, 100);
+  gamePage.removeEventListener('click', startTimer);
+}
 
 
 // Scroll and store user selection in playerGuessArray
 function select(guessedTrue) {
-  console.log('player guessed:', playerGuessArray);
   // Scroll 80px
   valueY += 80;
   itemContainer.scroll(0, valueY);
@@ -61,10 +100,8 @@ function getRandomInt(max){
 function createEquations() {
   // Randomly choose how many correct equations there should be
   const correctEquations = getRandomInt(questionAmount);
-  console.log('correct Equations', correctEquations);
   // Set amount of wrong equations
   const wrongEquations = questionAmount - correctEquations;
-  console.log('wrong Equations', wrongEquations);
   // Loop through, multiply random numbers up to 9, push to array
   for (let i = 0; i < correctEquations; i++) {
     firstNumber = getRandomInt(9);
@@ -172,7 +209,6 @@ function selectQuestionAmount(e){
   }
 }
 
-//Event Listeners
 startForm.addEventListener('click', () =>{
   radioContainers.forEach((radioEl) => {
     // Remove selected Label Styling
@@ -184,4 +220,6 @@ startForm.addEventListener('click', () =>{
   });
 });
 
+//Event Listeners
 startForm.addEventListener('submit', selectQuestionAmount);
+gamePage.addEventListener('click', startTimer);
